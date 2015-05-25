@@ -204,8 +204,8 @@ function render() {
 
     if( toggle > 0.02 && intersection != null ) {
 
-        spheres[ sphereIndex ].position.copy( intersection.point );
-        spheres[ sphereIndex ].scale.set( 1, 1, 1 );
+        spheres[ spheresIndex ].position.copy( intersection.point );
+        spheres[ spheresIndex ].scale.set( 1, 1, 1 );
         spheresIndex = ( spheresIndex + 1 ) % spheres.length;
 
         toggle = 0;
