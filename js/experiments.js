@@ -4,9 +4,9 @@ var clock;
 
 var particles, pGeom, pMat;
 
-var pointSize = 0.1;
-var NUMX = 10;
-var NUMY = 10;
+var pointSize = 0.2;
+var NUMX = 30;
+var NUMY = 30;
 var WIDTH = 15;
 var LENGTH = 15;
 
@@ -39,7 +39,7 @@ function init() {
             var particle = new THREE.Vector3( u, 0, v );
 
             var color = new THREE.Color();
-            color.setHSL( particle.y / 2, 1.0, 0.5 );
+            color.setHSL( particle.y / 5, 1.0, 0.5 );
 
             pGeom.vertices.push( particle );
             pGeom.colors.push( color );
@@ -48,7 +48,7 @@ function init() {
 
     }
 
-    pMat = new THREE.PointCloudMaterial( { vertexColors: THREE.VertexColors, size: pointSize } );
+    pMat = new THREE.PointCloudMaterial( { vertexColors: THREE.VertexColors, size: pointSize, transparent: true, opacity: 0.8 } );
 
     particles = new THREE.PointCloud( pGeom, pMat );
     scene.add( particles );
@@ -74,6 +74,19 @@ function animate() {
 
     requestAnimationFrame( animate );
 
+    for( var i = 0; i < pGeom.vertices.length; i++ ) {
+
+        var v = pGeom.vertices[ i ];
+        v.y = 0.5 * Math.sin( clock.getElapsedTime() + v.x ) + 0.5 * Math.cos( clock.getElapsedTime() + v.z );
+
+        var c = pGeom.colors[ i ];
+        c.setHSL( v.y / 5, 1.0, 0.5 );
+
+    }
+
+    pGeom.verticesNeedUpdate = true;
+    pGeom.colorsNeedUpdate = true;
+   
     render();
 
 }
