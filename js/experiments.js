@@ -1,11 +1,10 @@
 var renderer, scene, camera;
 
 var pointcloud;
-var raycaster, intersects;
+
 var mouse = new THREE.Vector2();
 var intersection = null;
-var spheres = [];
-var spheresIndex = 0;
+
 var clock;
 
 var threshold = 0.1;
@@ -151,29 +150,11 @@ function init() {
     scene.add( pointcloud );
 
     //
-    
-    var sphereGeometry = new THREE.SphereGeometry( 0.1, 32, 32 );
-    var sphereMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, shading: THREE.FlatShading } );
 
-    for( var i = 0; i < 40; i++ ) {
-
-        var sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
-        scene.add( sphere );
-        spheres.push( sphere );
-
-    }
-
-    //
-    
     renderer = new THREE.WebGLRenderer();
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
     container.appendChild( renderer.domElement );
-
-    //
-    
-    raycaster = new THREE.Raycaster();
-    raycaster.params.PointCloud.threshold = threshold;
 
     //
 
@@ -190,37 +171,10 @@ function animate() {
 
 }
 
-var toggle = 0;
-
 function render() {
 
     camera.applyMatrix( rotateY );
     camera.updateMatrixWorld();
-
-    raycaster.setFromCamera( mouse, camera );
-
-    var intersections = raycaster.intersectObject( pointcloud );
-    intersection = ( intersections.length ) > 0 ? intersections[ 0 ] : null;
-
-    if( toggle > 0.02 && intersection != null ) {
-
-        spheres[ spheresIndex ].position.copy( intersection.point );
-        spheres[ spheresIndex ].scale.set( 1, 1, 1 );
-        spheresIndex = ( spheresIndex + 1 ) % spheres.length;
-
-        toggle = 0;
-
-    }
-
-    for( var i = 0; i < spheres.length; i++ ) {
-
-        var sphere = spheres[ i ];
-        sphere.scale.multiplyScalar( 0.98 );
-        sphere.scale.clampScalar( 0.01, 1 );
-
-    }
-
-    toggle += clock.getDelta();
 
     renderer.render( scene, camera );
 
