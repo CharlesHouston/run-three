@@ -5,7 +5,7 @@ var particles, pGeom, pMat;
 var HSCALE = 5;
 var VSCALE = 2;
 
-var pointSize = 0.2;
+var pointSize = 0.05;
 
 var rotateY = new THREE.Matrix4().makeRotationY( 0.005 );
 
@@ -18,11 +18,9 @@ function init() {
 
     scene = new THREE.Scene();
 
-    clock = new THREE.Clock();
-
-    camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 20000 );
-    camera.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0, 20 ) );
-    camera.applyMatrix( new THREE.Matrix4().makeRotationX( -0.5 ) );
+    camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 20000 );
+    camera.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0, 25 ) );
+    camera.applyMatrix( new THREE.Matrix4().makeRotationX( -0.3 ) );
     scene.add( camera );
 
     renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -79,7 +77,7 @@ function init() {
 
     } );
 
-    pMat = new THREE.PointCloudMaterial( { vertexColors: THREE.VertexColors, size: 0.05 } );
+    pMat = new THREE.PointCloudMaterial( { vertexColors: THREE.VertexColors, size: pointSize } );
 
     particles = new THREE.PointCloud( pGeom, pMat );
     scene.add( particles );
