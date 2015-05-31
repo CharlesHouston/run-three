@@ -16,8 +16,8 @@ function init() {
 
     scene = new THREE.Scene();
 
-    camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 20000 );
-    camera.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0, 25 ) );
+    camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 20000 );
+    camera.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0, 35 ) );
     camera.applyMatrix( new THREE.Matrix4().makeRotationX( -0.3 ) );
 
     controls = new THREE.OrbitControls( camera );
