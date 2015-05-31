@@ -9,7 +9,7 @@ body {
     top: 0px;
     width: 100%;
     padding: 5px;
-    font-family: 'Roboto Mono';
+    font-family: 'Roboto Mono', Monospace, sans-serif;
     font-size: 13px;
     text-align: center;
     font-weight: bold;
@@ -20,7 +20,7 @@ body {
     bottom: 0px;
     width: 100%;
     padding: 5px;
-    font-family: 'Roboto Mono';
+    font-family: 'Roboto Mono', Monospace, sans-serif;
     font-size: 12px;
     text-align: center;
     font-weight: bold;
