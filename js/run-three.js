@@ -1,4 +1,4 @@
-var renderer, scene, camera;
+var renderer, scene, camera, controls;
 
 var particles, pGeom, pMat;
 
@@ -7,10 +7,8 @@ var VSCALE = 2;
 
 var pointSize = 0.05;
 
-var rotateY = new THREE.Matrix4().makeRotationY( 0.005 );
-
 init();
-animate();
+render();
 
 function init() {
     
@@ -21,7 +19,10 @@ function init() {
     camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 20000 );
     camera.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0, 25 ) );
     camera.applyMatrix( new THREE.Matrix4().makeRotationX( -0.3 ) );
-    scene.add( camera );
+
+    controls = new THREE.OrbitControls( camera );
+    controls.damping = 0.2;
+    controls.addEventListener( 'change', render );
 
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
@@ -82,29 +83,31 @@ function init() {
     particles = new THREE.PointCloud( pGeom, pMat );
     scene.add( particles );
 
+    animate();
+
 }
 
 function onWindowResize() {
 
     renderer.setSize( window.innerWidth, window.innerHeight );
+
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
+
+    render();
 
 }
 
 function animate() {
 
     requestAnimationFrame( animate );
-    render();
+    controls.update();
 
 }
 
 function render() {
 
-    camera.applyMatrix( rotateY );
-    camera.updateMatrixWorld();
-
-    renderer.render( scene, camera );
+   renderer.render( scene, camera );
 
 }
 
