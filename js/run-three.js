@@ -30,7 +30,7 @@ function init() {
 
     window.addEventListener( 'resize', onWindowResize, false );
 
-    var gpxpoints = getGPXPoints( "round_two_ultra.xml" );
+    var gpxpoints = getGPXPoints( "welsh_ultra_series_r2.xml" );
 
     pGeom = new THREE.Geometry();
 
