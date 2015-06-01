@@ -35,45 +35,14 @@ function init() {
 
     pGeom = new THREE.Geometry();
 
-    var xvals = [];
-    var yvals = [];
-    var zvals = [];
+    var processed_pts = processPoints( gpxpoints );
 
-    for( var i = 0; i < gpxpoints.length; i++ ) {
+    processed_pts.forEach( function( p ) {
 
-        xvals.push( gpxpoints[ i ].x );
-        yvals.push( gpxpoints[ i ].y );
-        zvals.push( gpxpoints[ i ].z );
-
-    }
-
-    var XMIN = Math.min.apply( null, xvals );
-    var XMAX = Math.max.apply( null, xvals );
-    var YMIN = Math.min.apply( null, yvals );
-    var YMAX = Math.max.apply( null, yvals );
-    var ZMIN = Math.min.apply( null, zvals );
-    var ZMAX = Math.max.apply( null, zvals );
-
-    var XRANGE = XMAX - XMIN;
-    var YRANGE = YMAX - YMIN;
-    var ZRANGE = ZMAX - ZMIN;
-  
-    gpxpoints.forEach( function( p ) {
-
-        var xnorm = 2 * ( p.x - XMIN ) / XRANGE - 1;
-        var u = HSCALE * xnorm;
-
-        var ynorm = 2 * ( p.y - YMIN ) / YRANGE - 1;
-        var v = VSCALE * ynorm;
-
-        var znorm = 2 * ( p.z - ZMIN ) / ZRANGE - 1;
-        var w = HSCALE * ZRANGE / XRANGE * znorm;
-
-        var vertex = new THREE.Vector3( u, v, w );
-        pGeom.vertices.push( vertex );
+        pGeom.vertices.push( p );
 
         var color = new THREE.Color();
-        color.setRGB( 1.0, ( 1 - ynorm ) / 2, ( 1 - ynorm ) / 2 );
+        color.setRGB( 1.0, ( 1 - p.y ) / 2, ( 1 - p.y ) / 2 );
         pGeom.colors.push( color );
 
     } );
@@ -164,5 +133,63 @@ function getGPXPoints( filename ) {
     }
 
     return points;
+
+}
+
+function processPoints( gpxpoints ) {
+
+    // Finding the min and max values
+    var xvals = [];
+    var yvals = [];
+    var zvals = [];
+
+    for( var i = 0; i < gpxpoints.length; i++ ) {
+
+        xvals.push( gpxpoints[ i ].x );
+        yvals.push( gpxpoints[ i ].y );
+        zvals.push( gpxpoints[ i ].z );
+
+    }
+
+    var XMIN = Math.min.apply( null, xvals );
+    var XMAX = Math.max.apply( null, xvals );
+    var YMIN = Math.min.apply( null, yvals );
+    var YMAX = Math.max.apply( null, yvals );
+    var ZMIN = Math.min.apply( null, zvals );
+    var ZMAX = Math.max.apply( null, zvals );
+
+    var XRANGE = XMAX - XMIN;
+    var YRANGE = YMAX - YMIN;
+    var ZRANGE = ZMAX - ZMIN;
+
+    // Normalising between -1 and 1 and scaling
+    var normalised = []
+
+    gpxpoints.forEach( function( p ) {
+
+        var xnorm = 2 * ( p.x - XMIN ) / XRANGE - 1;
+        var u = HSCALE * xnorm;
+
+        var ynorm = 2 * ( p.y - YMIN ) / YRANGE - 1;
+        var v = VSCALE * ynorm;
+
+        var znorm = 2 * ( p.z - ZMIN ) / ZRANGE - 1;
+        var w = HSCALE * ZRANGE / XRANGE * znorm;
+
+        normalised.push( new THREE.Vector3( u, v, w ) );
+
+    } );
+
+    var processed = [];
+
+    // Putting first data point at origin
+    for( var i = 0; i < normalised.length; i++ ) {
+
+        var vector = new THREE.Vector3( normalised[ i ].x - normalised[ 0 ].x, normalised[ i ].y, normalised[ i ].z - normalised[ 0 ].z );
+        processed.push( vector );
+
+    }
+    
+    return processed;
 
 }
