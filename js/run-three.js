@@ -31,7 +31,7 @@ function init() {
 
     window.addEventListener( 'resize', onWindowResize, false );
 
-    var gpxpoints = getGPXPoints( "welsh_ultra_series_r2.xml" );
+    var gpxpoints = getGPXPoints( "welsh_ultra_series_r2.gpx" );
 
     pGeom = new THREE.Geometry();
 
@@ -107,44 +107,62 @@ function animate() {
 
 function render() {
 
-   renderer.render( scene, camera );
+    renderer.render( scene, camera );
+
+}
+
+function loadXMLDoc( XMLname ) {
+
+    var xmlDoc;
+
+    if( window.XMLHttpRequest ) {
+
+        xmlDoc = new window.XMLHttpRequest();
+        xmlDoc.open( 'GET', XMLname, false );
+        xmlDoc.overrideMimeType( 'text/xml' );
+        xmlDoc.send( '' );
+        return xmlDoc.responseXML;
+
+    } else if ( ActiveXObject( 'Microsoft.XMLDOM' ) ) {
+
+        xmlDoc = new ActiveXObject( 'Microsoft.XMLDOM' );
+        xmlDoc.async = false;
+        xmlDoc.load( XMLname );
+        return xmlDoc;
+    
+    } else {
+
+        xmlhttp = new XMLHttpRequest();
+        xmlhttp.open( 'GET', XMLname, false );
+        xmlhttp.overrideMimeType( 'text/xml' );
+        xmlhttp.send( null );
+        return xmlDoc.responseXML;
+
+    }
+
+    alert( 'Error loading document!' );
+    return null;
 
 }
 
 function getGPXPoints( filename ) {
 
-  var xhttp;
-  var xmlDoc;
+    var xmlDoc = loadXMLDoc( filename );
 
-  if( window.XMLHttpRequest ) {
+    var trkpts = xmlDoc.getElementsByTagName( 'trkpt' );
+    var elevations = xmlDoc.getElementsByTagName( 'ele' );
+    var points = []
 
-    xhttp = new XMLHttpRequest();
+    for( var i = 0; i < trkpts.length; i++ ) {
 
-  } else {
+        var pt = new THREE.Vector3();
+        pt.x = parseFloat( trkpts[ i ].getAttribute( 'lat' ) );
+        pt.z = parseFloat( trkpts[ i ].getAttribute( 'lon' ) );
+        pt.y = parseFloat( elevations[ i ].childNodes[ 0 ].nodeValue );
+        points.push( pt );
 
-    xhttp = new ActiveXObject( 'Microsoft.XMLHTTP' );
+    }
 
-  }
-
-  xhttp.open( 'GET', filename, false );
-  xhttp.send();
-
-  xmlDoc = xhttp.responseXML;
-
-  var trkpts = xmlDoc.getElementsByTagName( 'trkpt' );
-  var elevations = xmlDoc.getElementsByTagName( 'ele' );
-  var points = []
-
-  for( var i = 0; i < trkpts.length; i++ ) {
-
-    var pt = new THREE.Vector3();
-    pt.x = parseFloat( trkpts[ i ].getAttribute( 'lat' ) );
-    pt.z = parseFloat( trkpts[ i ].getAttribute( 'lon' ) );
-    pt.y = parseFloat( elevations[ i ].childNodes[ 0 ].nodeValue );
-    points.push( pt );
-
-  }
-
-  return points;
+    return points;
 
 }
