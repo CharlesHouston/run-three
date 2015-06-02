@@ -34,26 +34,37 @@ function init() {
 
     window.addEventListener( 'resize', onWindowResize, false );
 
-    var gpxpoints = getGPXPoints( "welsh_ultra_series_r2.gpx" );
+    var ultraPts = getGPXPoints( "welsh_ultra_series_r2.gpx" );
+    var maraPts = getGPXPoints( "london-mara.gpx" );
+
+    processPoints( ultraPts, maraPts );
 
     pGeom = new THREE.Geometry();
+    var color = new THREE.Color( Math.random() * 0x808080 + 0x808080 );
 
-    var processed_pts = processPoints( gpxpoints );
-
-    processed_pts.forEach( function( p ) {
+    ultraPts.forEach( function( p ) {
 
         pGeom.vertices.push( p );
-
-        var color = new THREE.Color();
-        color.setRGB( 1.0, ( 1 - p.y ) / 2, ( 1 - p.y ) / 2 );
         pGeom.colors.push( color );
+
+    } );
+
+    var pGeom2 = new THREE.Geometry();
+    var color2 = new THREE.Color( Math.random() * 0x808080 + 0x808080 );
+
+    maraPts.forEach( function( p ) {
+
+        pGeom2.vertices.push( p );
+        pGeom2.colors.push( color2 );
 
     } );
 
     pMat = new THREE.PointCloudMaterial( { vertexColors: THREE.VertexColors, size: pointSize } );
 
     particles = new THREE.PointCloud( pGeom, pMat );
+    var particles2 = new THREE.PointCloud( pGeom2, pMat );
     scene.add( particles );
+    scene.add( particles2 );
 
     animate();
 
@@ -139,6 +150,8 @@ function getGPXPoints( filename ) {
 
         var dx = geoMeasure( points[ i ].x, points[ 0 ].z, points[ 0 ].x, points[ 0 ].z );
         var dz = geoMeasure( points[ 0 ].x, points[ i ].z, points[ 0 ].x, points[ 0 ].z );
+
+        var dy = points[ i ].y - points[ 0 ].y;
         
         if( points[ i ].x > points[ 0 ].x ) {
             points[ i ].x = dx;
@@ -152,9 +165,12 @@ function getGPXPoints( filename ) {
             points[ i ].z = -dz;
         }
 
+        points[ i ].y = dy;
+
     }
 
     points[ 0 ].x = 0.0;
+    points[ 0 ].y = 0.0;
     points[ 0 ].z = 0.0;
 
     return points;
@@ -177,18 +193,24 @@ function geoMeasure( lat1, lon1, lat2, lon2 ) {
 
 }
 
-function processPoints( gpxpoints ) {
+function processPoints() {
 
     // Finding the min and max values
     var xvals = [];
     var yvals = [];
     var zvals = [];
 
-    for( var i = 0; i < gpxpoints.length; i++ ) {
+    for( var i = 0; i < arguments.length; i++ ) {
 
-        xvals.push( gpxpoints[ i ].x );
-        yvals.push( gpxpoints[ i ].y );
-        zvals.push( gpxpoints[ i ].z );
+        var points = arguments[ i ];
+       
+        for( var j = 0; j < points.length; j++ ) {
+
+            xvals.push( points[ j ].x );
+            yvals.push( points[ j ].y );
+            zvals.push( points[ j ].z );
+
+        }
 
     }
 
@@ -203,34 +225,21 @@ function processPoints( gpxpoints ) {
     YRANGE = YMAX - YMIN;
     ZRANGE = ZMAX - ZMIN;
 
-    // Normalising between -1 and 1 and scaling
-    var normalised = []
+    for( var i = 0; i < arguments.length; i++ ) {
 
-    gpxpoints.forEach( function( p ) {
+        arguments[ i ].forEach( function( p ) {
 
-        var xnorm = 2 * ( p.x - XMIN ) / XRANGE - 1;
-        var u = HSCALE * xnorm;
+            var xnorm = 2 * ( p.x - XMIN ) / XRANGE - 1;
+            p.x = HSCALE * xnorm;
 
-        var ynorm = 2 * ( p.y - YMIN ) / YRANGE - 1;
-        var v = VSCALE * ynorm;
+            var ynorm = 2 * ( p.y - YMIN ) / YRANGE - 1;
+            p.y = VSCALE * ynorm;
 
-        var znorm = 2 * ( p.z - ZMIN ) / ZRANGE - 1;
-        var w = HSCALE * ZRANGE / XRANGE * znorm;
+            var znorm = 2 * ( p.z - ZMIN ) / ZRANGE - 1;
+            p.z = HSCALE * ZRANGE / XRANGE * znorm;
 
-        normalised.push( new THREE.Vector3( u, v, w ) );
-
-    } );
-
-    var processed = [];
-
-    // Putting first data point at origin
-    for( var i = 0; i < normalised.length; i++ ) {
-
-        var vector = new THREE.Vector3( normalised[ i ].x - normalised[ 0 ].x, normalised[ i ].y, normalised[ i ].z - normalised[ 0 ].z );
-        processed.push( vector );
+        } );
 
     }
-    
-    return processed;
 
 }
