@@ -1,8 +1,6 @@
 var renderer, scene, camera, controls;
 
-var particles, pGeom, pMat;
-
-var HSCALE = 5;
+var HSCALE = 8;
 var VSCALE = 2;
 
 var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
@@ -38,33 +36,7 @@ function init() {
     var maraPts = getGPXPoints( "london-mara.gpx" );
 
     processPoints( ultraPts, maraPts );
-
-    pGeom = new THREE.Geometry();
-    var color = new THREE.Color( Math.random() * 0x808080 + 0x808080 );
-
-    ultraPts.forEach( function( p ) {
-
-        pGeom.vertices.push( p );
-        pGeom.colors.push( color );
-
-    } );
-
-    var pGeom2 = new THREE.Geometry();
-    var color2 = new THREE.Color( Math.random() * 0x808080 + 0x808080 );
-
-    maraPts.forEach( function( p ) {
-
-        pGeom2.vertices.push( p );
-        pGeom2.colors.push( color2 );
-
-    } );
-
-    pMat = new THREE.PointCloudMaterial( { vertexColors: THREE.VertexColors, size: pointSize } );
-
-    particles = new THREE.PointCloud( pGeom, pMat );
-    var particles2 = new THREE.PointCloud( pGeom2, pMat );
-    scene.add( particles );
-    scene.add( particles2 );
+    make3DRuns( ultraPts, maraPts );   
 
     animate();
 
@@ -239,6 +211,29 @@ function processPoints() {
             p.z = HSCALE * ZRANGE / XRANGE * znorm;
 
         } );
+
+    }
+
+}
+
+function make3DRuns() {
+
+    for( var i = 0; i < arguments.length; i++ ) {
+
+        var geom = new THREE.Geometry();
+        var color = new THREE.Color( Math.random() * 0x808080 + 0x808080 );
+
+        arguments[ i ].forEach( function( p ) {
+
+            geom.vertices.push( p );
+            geom.colors.push( color );
+
+        } );
+
+        var mat = new THREE.PointCloudMaterial( { vertexColors: THREE.VertexColors, size: pointSize } );
+
+        var run = new THREE.PointCloud( geom, mat );
+        scene.add( run );
 
     }
 
