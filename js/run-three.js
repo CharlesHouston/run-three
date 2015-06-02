@@ -6,7 +6,7 @@ var VSCALE = 2;
 var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
 var XRANGE, YRANGE, ZRANGE;
 
-var pointSize = 0.05;
+var pointSize = 0.075;
 
 init();
 render();
