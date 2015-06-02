@@ -5,6 +5,9 @@ var particles, pGeom, pMat;
 var HSCALE = 5;
 var VSCALE = 2;
 
+var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
+var XRANGE, YRANGE, ZRANGE;
+
 var pointSize = 0.05;
 
 init();
@@ -132,7 +135,45 @@ function getGPXPoints( filename ) {
 
     }
 
+    for( var i = 1; i < points.length; i++ ) {
+
+        var dx = geoMeasure( points[ i ].x, points[ 0 ].z, points[ 0 ].x, points[ 0 ].z );
+        var dz = geoMeasure( points[ 0 ].x, points[ i ].z, points[ 0 ].x, points[ 0 ].z );
+        
+        if( points[ i ].x > points[ 0 ].x ) {
+            points[ i ].x = dx;
+        } else {
+            points[ i ].x = -dx;
+        }
+
+        if( points[ i ].z > points[ 0 ].z ) {
+            points[ i ].z = dz;
+        } else {
+            points[ i ].z = -dz;
+        }
+
+    }
+
+    points[ 0 ].x = 0.0;
+    points[ 0 ].z = 0.0;
+
     return points;
+
+}
+
+function geoMeasure( lat1, lon1, lat2, lon2 ) {
+
+    var R = 6378.137; // Radius of earth in km
+    var dLat = ( lat2 - lat1 ) * Math.PI / 180;
+    var dLon = ( lon2 - lon1 ) * Math.PI / 180;
+    var a = Math.sin( dLat / 2 ) * Math.sin( dLat / 2 ) +
+        Math.cos( lat1 * Math.PI / 180 ) * Math.cos( lat2 * Math.PI / 180 ) *
+        Math.sin( dLon / 2 ) * Math.sin( dLon / 2 );
+
+    var c = 2 * Math.atan2( Math.sqrt( a ), Math.sqrt( 1 - a ) );
+    var d = R * c;
+
+    return d * 1000; // Distance between in m
 
 }
 
@@ -151,16 +192,16 @@ function processPoints( gpxpoints ) {
 
     }
 
-    var XMIN = Math.min.apply( null, xvals );
-    var XMAX = Math.max.apply( null, xvals );
-    var YMIN = Math.min.apply( null, yvals );
-    var YMAX = Math.max.apply( null, yvals );
-    var ZMIN = Math.min.apply( null, zvals );
-    var ZMAX = Math.max.apply( null, zvals );
+    XMIN = Math.min.apply( null, xvals );
+    XMAX = Math.max.apply( null, xvals );
+    YMIN = Math.min.apply( null, yvals );
+    YMAX = Math.max.apply( null, yvals );
+    ZMIN = Math.min.apply( null, zvals );
+    ZMAX = Math.max.apply( null, zvals );
 
-    var XRANGE = XMAX - XMIN;
-    var YRANGE = YMAX - YMIN;
-    var ZRANGE = ZMAX - ZMIN;
+    XRANGE = XMAX - XMIN;
+    YRANGE = YMAX - YMIN;
+    ZRANGE = ZMAX - ZMIN;
 
     // Normalising between -1 and 1 and scaling
     var normalised = []
