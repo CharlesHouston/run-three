@@ -1,11 +1,9 @@
 function GPXParser() {
 
-    this.parse = function( file ) {
+    this.getPoints = function( file ) { 
 
-        var xmlDoc = loadXMLDoc( file );
-
-        var trkpts = xmlDoc.getElementsByTagName( 'trkpt' );
-        var elevations = xmlDoc.getElementsByTagName( 'ele' );
+        var trkpts = file.getElementsByTagName( 'trkpt' );
+        var elevations = file.getElementsByTagName( 'ele' );
         var points = []
 
         for( var i = 0; i < trkpts.length; i++ ) {
@@ -48,40 +46,6 @@ function GPXParser() {
         return points;
 
     };
-
-    function loadXMLDoc( file ) {
-
-        var xmlDoc;
-
-        if( window.XMLHttpRequest ) {
-
-            xmlDoc = new window.XMLHttpRequest();
-            xmlDoc.open( 'GET', file, false );
-            xmlDoc.overrideMimeType( 'text/xml' );
-            xmlDoc.send( '' );
-            return xmlDoc.responseXML;
-
-        } else if ( ActiveXObject( 'Microsoft.XMLDOM' ) ) {
-
-            xmlDoc = new ActiveXObject( 'Microsoft.XMLDOM' );
-            xmlDoc.async = false;
-            xmlDoc.load( file );
-            return xmlDoc;
-        
-        } else {
-
-            xmlhttp = new XMLHttpRequest();
-            xmlhttp.open( 'GET', file, false );
-            xmlhttp.overrideMimeType( 'text/xml' );
-            xmlhttp.send( null );
-            return xmlDoc.responseXML;
-
-        }
-
-        alert( 'Error loading document!' );
-        return null;
-
-    }
 
     function geoMeasure( lat1, lon1, lat2, lon2 ) {
 

@@ -16,7 +16,7 @@ function RunMaker() {
     var parser = new GPXParser();
 
     this.init = function() {
-
+        
         container = document.getElementById( 'container' );
 
         scene = new THREE.Scene();
@@ -27,7 +27,7 @@ function RunMaker() {
 
         controls = new THREE.OrbitControls( camera );
         controls.damping = 0.2;
-        controls.addEventListener( 'change', this.render );
+        controls.addEventListener( 'change', render );
 
         renderer = new THREE.WebGLRenderer( { antialias: true } );
         renderer.setPixelRatio( window.devicePixelRatio );
@@ -40,24 +40,40 @@ function RunMaker() {
 
     };
 
-    this.render = function() {
+    this.makeRun = function( file ) {
 
-        renderer.render( scene, camera );
+        parse( file );
 
     };
 
-    this.makeRun = function( file ) {
+    function onFileRead( evt ) {
 
-        var pts = parser.parse( file );
+        var strcontent = evt.target.result;
+        var parsed = new DOMParser().parseFromString( strcontent, 'text/xml' );
+        var pts = parser.getPoints( parsed );
         processPoints( pts );
         addRun( pts );
 
-    };
+    }
+
+    function parse( file ) {
+
+        var fileReader = new FileReader();
+        fileReader.addEventListener( 'loadend', onFileRead );
+        fileReader.readAsText( file );
+
+    }
 
     function animate() {
 
         requestAnimationFrame( animate );
         controls.update();
+
+    }
+
+    function render() {
+
+        renderer.render( scene, camera );
 
     }
 
@@ -68,7 +84,7 @@ function RunMaker() {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
 
-        renderer.render( scene, camera );
+        render();
 
     }
 
@@ -145,6 +161,8 @@ function RunMaker() {
 
             var run = new THREE.PointCloud( geom, mat );
             scene.add( run );
+
+            render();
 
         }
 
