@@ -11,7 +11,10 @@ function RunMaker() {
     var pointSize = 0.075;
 
     var parser = new GPXParser();
+
+    var needToUpdate = false;
     var runs = [];
+    var runPts = [];
   
     // Setting up renderer
     container = document.getElementById( 'container' );
@@ -48,8 +51,15 @@ function RunMaker() {
 
         var pts = parser.getPoints( parsed );
 
-        processPoints( pts );
-        addRun( pts );
+        runPts.push( pts );
+        if( runPts.length > 3 ) {
+
+            runPts.splice( 0, 1 );
+
+        }
+
+        var nPts = processPoints( pts );
+        addRun( nPts );
 
     }
 
@@ -85,91 +95,166 @@ function RunMaker() {
 
     }
 
-    function processPoints() {
+    function processPoints( pts ) {
 
         // Finding the min and max values
         var xvals = [];
         var yvals = [];
         var zvals = [];
 
-        for( var i = 0; i < arguments.length; i++ ) {
+        for( var j = 0; j < pts.length; j++ ) {
 
-            var points = arguments[ i ];
-           
-            for( var j = 0; j < points.length; j++ ) {
-
-                xvals.push( points[ j ].x );
-                yvals.push( points[ j ].y );
-                zvals.push( points[ j ].z );
-
-            }
+            xvals.push( pts[ j ].x );
+            yvals.push( pts[ j ].y );
+            zvals.push( pts[ j ].z );
 
         }
 
         if( XMIN == null ) {
 
-            XMIN = Math.min.apply( null, xvals );
-            XMAX = Math.max.apply( null, xvals );
-            YMIN = Math.min.apply( null, yvals );
-            YMAX = Math.max.apply( null, yvals );
-            ZMIN = Math.min.apply( null, zvals );
-            ZMAX = Math.max.apply( null, zvals );
+            XMIN = getMin( xvals );
+            XMAX = getMax( xvals );
+            YMIN = getMin( yvals );
+            YMAX = getMax( yvals );
+            ZMIN = getMin( zvals );
+            ZMAX = getMax( zvals );
 
-            XRANGE = XMAX - XMIN;
-            YRANGE = YMAX - YMIN;
-            ZRANGE = ZMAX - ZMIN;
+        } else {
+
+            if( getMin( xvals ) < XMIN ) {
+                
+                XMIN = getMin( xvals );
+                needToUpdate = true;
+
+            }
+
+            if( getMax( xvals ) > XMAX ) {
+
+                XMAX = getMax( xvals );
+                needToUpdate = true;
+
+            }
+
+            if( getMin( yvals ) < YMIN ) {
+
+                YMIN = getMin( yvals );
+                needToUpdate = true;
+
+            }
+
+            if( getMax( yvals ) > YMAX ) {
+
+                YMAX = getMax( yvals );
+                needToUpdate = true;
+
+            }
+
+            if( getMin( zvals ) < ZMIN ) {
+
+                ZMIN = getMin( zvals );
+                needToUpdate = true;
+
+            }
+
+            if( getMax( zvals ) > ZMAX ) {
+
+                ZMAX = getMax( zvals );
+                needToUpdate = true;
+
+            }
 
         }
+        
+        XRANGE = XMAX - XMIN;
+        YRANGE = YMAX - YMIN;
+        ZRANGE = ZMAX - ZMIN;
 
-        for( var i = 0; i < arguments.length; i++ ) {
+        return normalisePts( pts );
+        
+    }
 
-            arguments[ i ].forEach( function( p ) {
+    function updatePoints() {
 
-                var xnorm = 2 * ( p.x - XMIN ) / XRANGE - 1;
-                p.x = HSCALE * xnorm;
+        for( var i = 0; i < runs.length - 1; i++ ) {
 
-                var ynorm = 2 * ( p.y - YMIN ) / YRANGE - 1;
-                p.y = VSCALE * ynorm;
-
-                var znorm = 2 * ( p.z - ZMIN ) / ZRANGE - 1;
-                p.z = HSCALE * ZRANGE / XRANGE * znorm;
-
-            } );
+            var nPts = normalisePts( runPts[ i ] );
+            runs[ i ].geometry.vertices = nPts;
+            runs[ i ].geometry.verticesNeedUpdate = true;
 
         }
 
     }
 
-    function addRun() {
+    function normalisePts( pts ) {
 
-        for( var i = 0; i < arguments.length; i++ ) {
+        var nPts = [];
 
-            var geom = new THREE.Geometry();
-            var color = new THREE.Color( Math.random() * 0x808080 + 0x808080 );
+        for( var i = 0; i < pts.length; i++ ) {
 
-            arguments[ i ].forEach( function( p ) {
+            var p = new THREE.Vector3();
 
-                geom.vertices.push( p );
-                geom.colors.push( color );
+            var xnorm = 2 * ( pts[ i ].x - XMIN ) / XRANGE - 1;
+            p.x = HSCALE * xnorm;
 
-            } );
+            var ynorm = 2 * ( pts[ i ].y - YMIN ) / YRANGE - 1;
+            p.y = VSCALE * ynorm;
 
-            var mat = new THREE.PointCloudMaterial( { vertexColors: THREE.VertexColors, size: pointSize } );
+            var znorm = 2 * ( pts[ i ].z - ZMIN ) / ZRANGE - 1;
+            p.z = HSCALE * ZRANGE / XRANGE * znorm;
 
-            var run = new THREE.PointCloud( geom, mat );
-            runs.push( run );
-            if( runs.length > 3 ) {
-
-                scene.remove( runs[ 0 ] );
-                runs.splice( 0, 1 );
-
-            }
-
-            scene.add( run );
-
-            render();
+            nPts.push( p );
 
         }
+
+        return nPts;
+
+    }
+
+    function addRun( pts ) {
+
+        var geom = new THREE.Geometry();
+        var color = new THREE.Color( Math.random() * 0x808080 + 0x808080 );
+
+        pts.forEach( function( p ) {
+
+            geom.vertices.push( p );
+            geom.colors.push( color );
+
+        } );
+
+        var mat = new THREE.PointCloudMaterial( { vertexColors: THREE.VertexColors, size: pointSize } );
+
+        var run = new THREE.PointCloud( geom, mat );
+        runs.push( run );
+        if( runs.length > 3 ) {
+
+            scene.remove( runs[ 0 ] );
+            runs.splice( 0, 1 );
+
+        }
+
+        if( needToUpdate ) {
+
+            updatePoints();
+            needToUpdate = false;
+
+        }
+
+        scene.add( run );
+
+        render();
+
+    }
+
+    function getMin( vals ) {
+        
+        return Math.min.apply( null, vals );
+
+    }
+
+    function getMax( vals ) {
+
+        return Math.max.apply( null, vals );
 
     }
 
