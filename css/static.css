@@ -1,29 +1,40 @@
-body {
-    color: #ffffff;
-    background-color: #000000;
-    margin: 0px;
+html, body {
+    padding: 0;
+    margin: 0;
+    background: #111;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
 }
 #info {
     position: absolute;
-    top: 0px;
-    width: 100%;
+    bottom: 0px;
+    right: 0px;
     padding: 5px;
     font-family: 'Roboto Mono', Monospace, sans-serif;
-    font-size: 13px;
-    text-align: center;
-    font-weight: bold;
-    color: #ccc;
+    font-size: 11px;
+    text-align: right;
+    color: #aaa;
 }
 #drop_zone {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0) url('../ready-to-run.png') 50% 50% no-repeat;
+    background-size: 400px 80px;
+}
+#drop_zone.dropped {
+    background-image: none;
+}
+#drop_zone.dropped * {
+    display: none;
+}
+canvas {
     position: absolute;
-    bottom: 10px;
+    left: 0;
+    top: 0;
     width: 100%;
-    height: 10%;
-    padding: 5px;
-    font-family: 'Roboto Mono', Monospace, sans-serif;
-    font-size: 15px;
-    text-align: center;
-    color: #ccc;
-    background-color: #111;
+    height: 100%;
 }
