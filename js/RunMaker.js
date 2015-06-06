@@ -1,10 +1,7 @@
 function RunMaker() {
 
-    var renderer;
-    var scene;
-    var camera;
-    var controls;
-
+    var renderer, scene, camera, controls;
+    
     var HSCALE = 8;
     var VSCALE = 2;
 
@@ -14,31 +11,29 @@ function RunMaker() {
     var pointSize = 0.075;
 
     var parser = new GPXParser();
+    var runs = [];
+  
+    // Setting up renderer
+    container = document.getElementById( 'container' );
 
-    this.init = function() {
-        
-        container = document.getElementById( 'container' );
+    scene = new THREE.Scene();
 
-        scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 20000 );
+    camera.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0, 35 ) );
+    camera.applyMatrix( new THREE.Matrix4().makeRotationX( -0.3 ) );
 
-        camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 20000 );
-        camera.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0, 35 ) );
-        camera.applyMatrix( new THREE.Matrix4().makeRotationX( -0.3 ) );
+    controls = new THREE.OrbitControls( camera );
+    controls.damping = 0.2;
+    controls.addEventListener( 'change', render );
 
-        controls = new THREE.OrbitControls( camera );
-        controls.damping = 0.2;
-        controls.addEventListener( 'change', render );
+    renderer = new THREE.WebGLRenderer( { antialias: true } );
+    renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    container.appendChild( renderer.domElement );
 
-        renderer = new THREE.WebGLRenderer( { antialias: true } );
-        renderer.setPixelRatio( window.devicePixelRatio );
-        renderer.setSize( window.innerWidth, window.innerHeight );
-        container.appendChild( renderer.domElement );
+    window.addEventListener( 'resize', onWindowResize, false );
 
-        window.addEventListener( 'resize', onWindowResize, false );
-
-        animate();
-
-    };
+    requestAnimationFrame( animate );
 
     this.makeRun = function( file ) {
 
@@ -50,7 +45,9 @@ function RunMaker() {
 
         var strcontent = evt.target.result;
         var parsed = new DOMParser().parseFromString( strcontent, 'text/xml' );
+
         var pts = parser.getPoints( parsed );
+
         processPoints( pts );
         addRun( pts );
 
@@ -160,6 +157,14 @@ function RunMaker() {
             var mat = new THREE.PointCloudMaterial( { vertexColors: THREE.VertexColors, size: pointSize } );
 
             var run = new THREE.PointCloud( geom, mat );
+            runs.push( run );
+            if( runs.length > 3 ) {
+
+                scene.remove( runs[ 0 ] );
+                runs.splice( 0, 1 );
+
+            }
+
             scene.add( run );
 
             render();

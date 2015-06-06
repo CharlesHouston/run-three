@@ -1,7 +1,6 @@
 ( function() {
 
     var runMaker = new RunMaker();
-    runMaker.init();
     var fileDropArea = document.getElementById( 'drop_zone' );
 
     fileDropArea.addEventListener( 'drop', dropFile, false );
