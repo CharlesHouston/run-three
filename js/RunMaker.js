@@ -1,6 +1,6 @@
 function RunMaker() {
 
-    var renderer, scene, camera, controls;
+    var renderer, scene, camera, controls, timer;
     
     var HSCALE = 8;
     var VSCALE = 2;
@@ -15,6 +15,9 @@ function RunMaker() {
     var needToUpdate = false;
     var runs = [];
     var runPts = [];
+
+    var spheres = [];
+    var spherePointIndexes = [];
   
     // Setting up renderer
     container = document.getElementById( 'container' );
@@ -29,6 +32,8 @@ function RunMaker() {
     controls.damping = 0.2;
     controls.addEventListener( 'change', render );
 
+    timer = new THREE.Clock();
+
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
@@ -36,7 +41,7 @@ function RunMaker() {
 
     window.addEventListener( 'resize', onWindowResize, false );
 
-    requestAnimationFrame( animate );
+    animate();
 
     this.makeRun = function( file ) {
 
@@ -71,9 +76,31 @@ function RunMaker() {
 
     }
 
+    var toggle = 0;
+
     function animate() {
 
         requestAnimationFrame( animate );
+
+        if( toggle > 0.1 ) {
+
+            for( var i = 0; i < spheres.length; i++ ) {
+
+                spheres[ i ].position.copy( runs[ i ].geometry.vertices[ spherePointIndexes[ i ] ] );
+                spherePointIndexes[ i ] += 1;
+                if( spherePointIndexes[ i ] > runs[ i ].geometry.vertices.length - 1 ) {
+                    
+                    spherePointIndexes[ i ] = 0;
+
+                }
+
+            }
+
+        }
+
+        toggle += timer.getDelta();
+
+        render();
         controls.update();
 
     }
@@ -231,6 +258,10 @@ function RunMaker() {
             scene.remove( runs[ 0 ] );
             runs.splice( 0, 1 );
 
+            scene.remove( spheres[ 0 ]);
+            spheres.splice( 0, 1 );
+            spherePointIndexes.splice( 0, 1 );
+
         }
 
         if( needToUpdate ) {
@@ -241,6 +272,15 @@ function RunMaker() {
         }
 
         scene.add( run );
+
+        var sphereGeom = new THREE.SphereGeometry( 0.2, 32, 32 );
+        var sphereMat = new THREE.MeshBasicMaterial( { color: color } );
+        var sphere = new THREE.Mesh( sphereGeom, sphereMat );
+        sphere.position.set( 0, 0, 0 );
+        scene.add( sphere );
+
+        spheres.push( sphere );
+        spherePointIndexes.push( 0 );
 
         render();
 
