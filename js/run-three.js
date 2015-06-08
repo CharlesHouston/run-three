@@ -17,7 +17,17 @@
 
         if( files.length ) {
 
-            go( files[ 0 ] );
+            var extension = files[ 0 ].name.split( '.' ).pop().toLowerCase();
+
+            if( extension === 'gpx' ) {
+
+                go( files[ 0 ] );
+
+            } else {
+
+                alert( 'GPX file please!' );
+
+            }
 
         }
 
