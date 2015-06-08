@@ -18,6 +18,7 @@ function RunMaker() {
 
     var spheres = [];
     var spherePointIndexes = [];
+    var trailing = 6;
   
     // Setting up renderer
     container = document.getElementById( 'container' );
@@ -82,11 +83,17 @@ function RunMaker() {
 
         requestAnimationFrame( animate );
 
-        if( toggle > 0.1 ) {
+        if( toggle > 0.02 ) {
 
             for( var i = 0; i < spheres.length; i++ ) {
 
-                spheres[ i ].position.copy( runs[ i ].geometry.vertices[ spherePointIndexes[ i ] ] );
+                for( var j = 0; j < spheres[ i ].length; j++ ) {
+
+                    var newPosIndex = spherePointIndexes[ i ] + 5 * ( trailing - j - 1 );
+                    spheres[ i ][ j ].position.copy( runs[ i ].geometry.vertices[ clamp( newPosIndex, 0, runs[ i ].geometry.vertices.length - 1 ) ] );
+
+                }
+
                 spherePointIndexes[ i ] += 1;
                 if( spherePointIndexes[ i ] > runs[ i ].geometry.vertices.length - 1 ) {
                     
@@ -108,6 +115,24 @@ function RunMaker() {
     function render() {
 
         renderer.render( scene, camera );
+
+    }
+
+    function clamp( value, min, max ) {
+
+        if( value > max ) {
+            
+            return max;
+
+        } else if( value < min ) {
+
+            return min;
+
+        } else {
+
+            return value;
+
+        }
 
     }
 
@@ -273,13 +298,23 @@ function RunMaker() {
 
         scene.add( run );
 
-        var sphereGeom = new THREE.SphereGeometry( 0.2, 32, 32 );
-        var sphereMat = new THREE.MeshBasicMaterial( { color: color } );
-        var sphere = new THREE.Mesh( sphereGeom, sphereMat );
-        sphere.position.set( 0, 0, 0 );
-        scene.add( sphere );
+        // Spheres 'running' course
+       
+        var trail = [];
 
-        spheres.push( sphere );
+        for( var i = 0; i < trailing; i++ ) {
+
+            var sphereGeom = new THREE.SphereGeometry( 0.15 - 0.075 * ( i / trailing ), 32, 32 );
+            var sphereMat = new THREE.MeshBasicMaterial( { color: color } );
+            var sphere = new THREE.Mesh( sphereGeom, sphereMat );
+            sphere.position.set( 0, 0, 0 );
+            scene.add( sphere );
+
+            trail.push( sphere );
+        
+        }
+
+        spheres.push( trail );
         spherePointIndexes.push( 0 );
 
         render();
