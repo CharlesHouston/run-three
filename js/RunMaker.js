@@ -283,7 +283,11 @@ function RunMaker() {
             scene.remove( runs[ 0 ] );
             runs.splice( 0, 1 );
 
-            scene.remove( spheres[ 0 ]);
+            for( var j = 0; j < spheres[ 0 ].length; j++ ) {
+                
+                scene.remove( spheres[ 0 ][ j ] );
+                
+            }
             spheres.splice( 0, 1 );
             spherePointIndexes.splice( 0, 1 );
 
