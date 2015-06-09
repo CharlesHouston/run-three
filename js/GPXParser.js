@@ -1,6 +1,6 @@
 function GPXParser() {
 
-    this.getPoints = function( file ) { 
+    this.getPoints = function( file, smooth ) { 
 
         var trkpts = file.getElementsByTagName( 'trkpt' );
         var elevations = file.getElementsByTagName( 'ele' );
@@ -43,9 +43,47 @@ function GPXParser() {
         points[ 0 ].y = 0.0;
         points[ 0 ].z = 0.0;
 
+        if( smooth ) {
+            
+            smoothPoints( points );
+
+        }
+
         return points;
 
     };
+
+    function smoothPoints( pts ) {
+
+        var nPts = [];
+
+        for( var i = 2; i < pts.length - 3; i++ ) {
+
+            nPts.push( average( pts[ i-1 ].y, pts[ i ].y, pts[ i+1 ].y, pts[ i-2 ].y, pts[ i+2 ].y ) ); 
+
+        }
+
+        for( var i = 2; i < pts.length - 3; i++ ) {
+
+            pts[ i ].y = nPts[ i - 2 ];
+
+        }
+
+    }
+
+    function average() {
+
+        var sum = 0;
+
+        for( var i = 0; i < arguments.length; i++ ) {
+            
+            sum += arguments[ i ];
+
+        }
+
+        return sum / arguments.length;
+
+    }
 
     function geoMeasure( lat1, lon1, lat2, lon2 ) {
 

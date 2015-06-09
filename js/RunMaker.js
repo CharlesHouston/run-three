@@ -55,7 +55,7 @@ function RunMaker() {
         var strcontent = evt.target.result;
         var parsed = new DOMParser().parseFromString( strcontent, 'text/xml' );
 
-        var pts = parser.getPoints( parsed );
+        var pts = parser.getPoints( parsed, true );
 
         runPts.push( pts );
         if( runPts.length > 3 ) {
