@@ -2,11 +2,14 @@
 
     var runMaker = new RunMaker();
     var fileDropArea = document.getElementById( 'drop_zone' );
+    var fileUploadForm = document.getElementById( 'file-chooser' );
+    var fileInput = document.getElementById( 'source-file' );
 
     fileDropArea.addEventListener( 'drop', dropFile, false );
     fileDropArea.addEventListener( 'dragover', cancel, false );
     fileDropArea.addEventListener( 'dragenter', cancel, false );
     fileDropArea.addEventListener( 'dragexit', cancel, false );
+    fileUploadForm.addEventListener( 'submit', onSubmit, false );
 
     function dropFile( evt ) {
 
@@ -25,7 +28,30 @@
 
             } else {
 
-                alert( 'GPX file please!' );
+                alert( 'Only GPX files will work!' );
+
+            }
+
+        }
+
+    }
+
+    function onSubmit( evt ) {
+
+        evt.preventDefault();
+        evt.stopImmediatePropagation();
+
+        if( fileInput.files.length ) {
+
+            var extension = fileInput.files[ 0 ].name.split( '.' ).pop().toLowerCase();
+
+            if( extension === 'gpx' ) {
+
+                go( fileInput.files[ 0 ] );
+
+            } else {
+
+                alert( 'Only GPX files will work!' );
 
             }
 
