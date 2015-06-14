@@ -10,9 +10,20 @@
 
 <body>
 
-    <div id="container"></div>
-    <div id="info">experiment created by chouston</div>
-    <div id="drop_zone"></div>
+    <canvas id="container"></canvas>
+    <div id="drop_zone">
+        <div id="alternative">
+            <form id="file-chooser">
+                <p>Want to use a file uploader instead?</p>
+                <div>
+                    <input name="source-file" id="source-file" type="file" />
+                </div>
+                <div>
+                    <input type="submit" />
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script src="js/three.min.js" type="text/javascript"></script>
     <script src="js/OrbitControls.js" type="text/javascript"></script>
