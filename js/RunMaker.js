@@ -38,6 +38,7 @@ function RunMaker() {
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setClearColor( 0x101010 );
     container.appendChild( renderer.domElement );
 
     window.addEventListener( 'resize', onWindowResize, false );
