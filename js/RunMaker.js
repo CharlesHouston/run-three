@@ -90,7 +90,7 @@ function RunMaker() {
 
                 for( var j = 0; j < spheres[ i ].length; j++ ) {
 
-                    var newPosIndex = spherePointIndexes[ i ] + 5 * ( trailing - j - 1 );
+                    var newPosIndex = spherePointIndexes[ i ] + 3 * ( trailing - j - 1 );
                     spheres[ i ][ j ].position.copy( runs[ i ].geometry.vertices[ clamp( newPosIndex, 0, runs[ i ].geometry.vertices.length - 1 ) ] );
 
                 }
@@ -309,7 +309,7 @@ function RunMaker() {
 
         for( var i = 0; i < trailing; i++ ) {
 
-            var sphereGeom = new THREE.SphereGeometry( 0.15 - 0.075 * ( i / trailing ), 32, 32 );
+            var sphereGeom = new THREE.SphereGeometry( 0.025 + 0.125 * 1 / Math.pow( i / trailing + 1, 3 ), 32, 32 );
             var sphereMat = new THREE.MeshBasicMaterial( { color: color } );
             var sphere = new THREE.Mesh( sphereGeom, sphereMat );
             sphere.position.set( 0, 0, 0 );
