@@ -51,11 +51,36 @@ function RunMaker() {
 
     };
 
+    this.exampleRuns = function() {
+        
+        loadExamples();
+
+    };
+
     function onFileRead( evt ) {
 
-        var strcontent = evt.target.result;
-        var parsed = new DOMParser().parseFromString( strcontent, 'text/xml' );
+        addPoints( evt.target.result );
 
+    }
+ 
+    function loadExamples() {
+        
+        var req = new XMLHttpRequest();
+        req.onload = onFileLoad;
+        req.open( "GET", "london-mara.gpx", true );
+        req.send();
+       
+    }
+
+    function onFileLoad() {
+
+        addPoints( this.responseText );
+
+    }
+   
+    function addPoints( strcontent ) {
+
+        var parsed = new DOMParser().parseFromString( strcontent, 'text/xml' );
         var pts = parser.getPoints( parsed, true );
 
         runPts.push( pts );
@@ -84,7 +109,7 @@ function RunMaker() {
 
         requestAnimationFrame( animate );
 
-        if( toggle > 0.02 ) {
+        if( toggle > 0.01 ) {
 
             for( var i = 0; i < spheres.length; i++ ) {
 
